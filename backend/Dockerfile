@@ -12,4 +12,4 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 USER appuser
 
-CMD ["python", "app.py"]
+CMD ["gunicorn", "--no-control-socket", "--bind", "0.0.0.0:5000", "--workers", "2", "app:app"]

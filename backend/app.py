@@ -1,3 +1,4 @@
+
 import os
 
 import psycopg2
@@ -39,8 +40,3 @@ def db_health():
 @app.route("/")
 def home():
     return jsonify(message="Secure App backend is running!")
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
-

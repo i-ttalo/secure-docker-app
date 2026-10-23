@@ -24,9 +24,13 @@ jobs:
           python -m pip install -r backend/requirements.txt
           python -m pip install pytest
           python -m pip install ruff==0.17.1
+          python -m pip install bandit==1.9.4
 
       - name: Run tests
         run: python -m pytest -v
 
       - name: Run Ruff
         run: python -m ruff check backend/
+
+      - name: Run Bandit Security Scan
+        run: python -m bandit -r backend/ -x backend/test_app.py

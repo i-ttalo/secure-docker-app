@@ -25,6 +25,7 @@ jobs:
           python -m pip install pytest
           python -m pip install ruff==0.17.1
           python -m pip install bandit==1.9.4
+          python -m pip install pip-audit==2.10.1
 
       - name: Run tests
         run: python -m pytest -v
@@ -34,3 +35,6 @@ jobs:
 
       - name: Run Bandit Security Scan
         run: python -m bandit -r backend/ -x backend/test_app.py
+
+      - name: Audit Python Dependencies
+        run: python -m pip_audit -r backend/requirements.txt

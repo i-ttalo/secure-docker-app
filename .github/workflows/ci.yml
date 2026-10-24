@@ -60,7 +60,7 @@ jobs:
         run: docker build -t secure-app-frontend:ci ./frontend
 
       - name: Trivy scan - Backend
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: image
           image-ref: secure-app-backend:ci
@@ -70,7 +70,7 @@ jobs:
           exit-code: "1"
 
       - name: Trivy scan - Frontend
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: image
           image-ref: secure-app-frontend:ci

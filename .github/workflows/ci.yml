@@ -59,7 +59,14 @@ jobs:
       - name: Build frontend image
         run: docker build -t secure-app-frontend:ci ./frontend
 
-      - name: Trivy scan - Backend
+      - name: Validate Nginx Configuration
+        run: |
+          docker run --rm \
+            --entrypoint nginx \
+            secure-app-frontend:ci \
+            -t
+
+      - name: Trivy Scan - Backend
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: image
@@ -69,7 +76,7 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: "1"
 
-      - name: Trivy scan - Frontend
+      - name: Trivy Scan - Frontend
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: image

@@ -62,6 +62,7 @@ jobs:
       - name: Validate Nginx Configuration
         run: |
           docker run --rm \
+            --add-host backend:127.0.0.1 \
             --entrypoint nginx \
             secure-app-frontend:ci \
             -t

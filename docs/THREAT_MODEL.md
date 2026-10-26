@@ -79,3 +79,56 @@ Rate limiting does not fully prevent distributed denial-of-service attacks. Requ
 - Evaluate TLS for external deployments.
 - Expand request limiting where appropriate.
 - Continue STRIDE analysis for other assets and trust boundaries.
+
+
+
+### THREAT-002 — Database Credential Exposure
+
+**STRIDE Category:** Information Disclosure
+
+**Affected Asset:** PostgreSQL credentials
+
+**Attack Surface:**
+- Docker container environment variables
+- Local configuration files
+- Docker daemon and host filesystem access
+
+**Threat Description:**
+
+An attacker with sufficient access to Docker container metadata or local configuration files may obtain database credentials.
+
+**Initial Finding:**
+
+The backend and database containers exposed their passwords through environment variables inspectable with Docker.
+
+**Mitigation Implemented:**
+
+- Migrated credentials to Docker Compose Secrets.
+- Configured Flask to read `/run/secrets/db_password`.
+- Configured PostgreSQL with `POSTGRES_PASSWORD_FILE`.
+- Removed password values from container environment variables.
+- Excluded the local `secrets/` directory from Git.
+- Mounted the secret as read-only.
+- Applied restricted filesystem permissions and ACLs.
+
+**Validation:**
+
+- `DB_PASSWORD` absent from backend container metadata.
+- `POSTGRES_PASSWORD` absent from database container metadata.
+- `POSTGRES_PASSWORD_FILE` configured.
+- Secret mounted with `RW=false`.
+- Secret reading verified from an authorized execution context.
+- `/api/db-health` returned HTTP 200.
+- PostgreSQL remained operational with persistent data.
+
+**Known Limitation:**
+
+Direct reading of the bind-mounted secret as UID 70 failed in an isolated container test, despite a host ACL. The PostgreSQL image's normal startup path remained functional.
+
+**Residual Risk:**
+
+Docker Compose file-backed secrets are not a dedicated encrypted secret-management service.
+
+Administrators with sufficient Docker or host access may still retrieve the secret. Local filesystem ACLs and UID mappings can behave differently across environments.
+
+**Status:** Partially mitigated — residual risk remains.

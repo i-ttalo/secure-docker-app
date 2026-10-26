@@ -36,7 +36,7 @@ def db_health():
     except psycopg2.OperationalError:
         return jsonify(
             database="error",
-            message="Database unavailable"
+            message="Database unavailable",
         ), 500
 
 

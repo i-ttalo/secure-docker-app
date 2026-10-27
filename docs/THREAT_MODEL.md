@@ -132,3 +132,55 @@ Docker Compose file-backed secrets are not a dedicated encrypted secret-manageme
 Administrators with sufficient Docker or host access may still retrieve the secret. Local filesystem ACLs and UID mappings can behave differently across environments.
 
 **Status:** Partially mitigated — residual risk remains.
+
+
+## THREAT-003 — Software Supply Chain Compromise
+
+**STRIDE Category:** Tampering
+
+### Threat Description
+
+An attacker could compromise a base Docker image or a software
+dependency used during the application's build process.
+
+Mutable image tags and unverified dependencies may introduce
+unexpected or malicious components into production images.
+
+### Affected Assets
+
+- Backend Docker image
+- Frontend Docker image
+- Python dependencies
+- CI/CD build pipeline
+
+### Implemented Mitigations
+
+1. Docker base images are pinned using SHA-256 digests.
+2. Trivy scans backend and frontend images for HIGH and
+   CRITICAL vulnerabilities during CI.
+3. pip-audit checks Python dependencies.
+4. CycloneDX SBOMs are automatically generated in CI.
+5. SBOMs are retained as GitHub Actions artifacts for 30 days.
+
+### Verification
+
+- Both Docker images build successfully using pinned digests.
+- Trivy identified no HIGH or CRITICAL vulnerabilities
+  in the tested images.
+- GitHub Actions completed successfully.
+- Backend and frontend SBOM generation succeeded.
+
+### Residual Risks
+
+- Pinned images do not receive updates automatically.
+- Vulnerability scanners cannot identify every security issue.
+- SHA-256 pinning does not independently verify image provenance.
+- Python dependencies are not yet fully locked.
+- Third-party GitHub Actions are not yet pinned by commit SHA.
+
+### Maintenance Policy
+
+- Review base-image updates at least monthly.
+- Update image digests when security fixes are released.
+- Run all CI security checks after dependency updates.
+- Review newly disclosed vulnerabilities affecting the SBOM components.

@@ -37,6 +37,10 @@ jobs:
 
       - name: Run Ruff
         run: python -m ruff check backend/
+      - name: Validate Docker Compose Security
+        run: |
+          python -m pip install pyyaml
+          python scripts/check_compose_security.py
 
       - name: Run Bandit Security Scan
         run: python -m bandit -r backend/ -x backend/test_app.py

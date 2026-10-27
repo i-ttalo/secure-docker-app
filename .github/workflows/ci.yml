@@ -55,7 +55,15 @@ jobs:
 
       - name: Build backend image
         run: docker build -t secure-app-backend:ci ./backend
+      - name: Verify Backend Container Hardening
+        run: |
+          docker run -d --name secure_backend_ci \
+            --read-only \
+            --tmpfs /tmp \
+            --cap-drop ALL \
+            secure-app-backend:ci
 
+          bash scripts/check-container-security.sh secure_backend_ci
       - name: Build frontend image
         run: docker build -t secure-app-frontend:ci ./frontend
 

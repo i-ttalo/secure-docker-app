@@ -184,3 +184,45 @@ unexpected or malicious components into production images.
 - Update image digests when security fixes are released.
 - Run all CI security checks after dependency updates.
 - Review newly disclosed vulnerabilities affecting the SBOM components.
+
+
+## THREAT-004 — Unauthorized Container Modification
+
+**STRIDE Category:** Tampering
+
+### Threat Description
+
+An attacker who gains code execution inside the backend
+container could attempt to modify application files,
+install malicious tools, or abuse excessive privileges.
+
+### Affected Assets
+
+- Backend application files
+- Container runtime
+- Application integrity
+
+### Implemented Mitigations
+
+1. Backend executes as non-root user (UID 100).
+2. Root filesystem is configured as read-only.
+3. /tmp uses a writable temporary filesystem.
+4. All Linux capabilities are dropped.
+5. Container hardening is tested using an automated script.
+
+### Verification
+
+- Writing to /app was denied.
+- Writing to /tmp succeeded.
+- Container executed as UID 100.
+- Docker confirmed ReadonlyRootfs=true.
+- Docker confirmed CapDrop=["ALL"].
+- Backend successfully connected to PostgreSQL after recreation.
+
+### Residual Risks
+
+- A read-only filesystem does not prevent memory-based attacks.
+- Temporary writable locations may still be abused.
+- Application vulnerabilities can still allow unauthorized requests.
+- Docker daemon or host compromise can bypass container isolation.
+- Runtime controls do not replace patching and monitoring.

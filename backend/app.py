@@ -30,14 +30,18 @@ def db_health():
     try:
         conn = get_db_connection()
         conn.close()
-
         return jsonify(database="connected")
 
     except psycopg2.OperationalError:
+        app.logger.warning(
+            "security_event=db_connection_failed "
+            "endpoint=/db-health"
+        )
         return jsonify(
             database="error",
             message="Database unavailable",
         ), 500
+
 
 
 @app.route("/")

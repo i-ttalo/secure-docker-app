@@ -273,3 +273,59 @@ or unauthorized credentials.
 - Mutual TLS is not currently implemented between services.
 - Privileged access to the Docker host may bypass network
   and credential protections.
+
+
+## THREAT-006 — Insufficient Audit Logging
+
+**STRIDE Category:** Repudiation
+
+### Threat Description
+
+An attacker or unauthorized user could perform suspicious
+actions without leaving sufficient evidence for investigation.
+
+Missing or incomplete logs may prevent incident reconstruction.
+
+### Affected Assets
+
+- Nginx access logs
+- Flask application logs
+- PostgreSQL authentication logs
+- Docker container logs
+
+### Implemented Mitigations
+
+1. Nginx records HTTP requests, response codes and timestamps.
+2. Nginx records rate-limiting events with HTTP 429.
+3. PostgreSQL records failed authentication attempts.
+4. Flask logs database connection failures without exposing
+   passwords or internal exception messages.
+5. Automated tests verify the Flask security event.
+6. Docker log rotation limits local log storage to
+   three files of approximately 10 MB per container.
+
+### Verification
+
+- HTTP 429 events were recorded by Nginx.
+- PostgreSQL logged an invalid-password authentication attempt.
+- Flask logging tests passed.
+- Docker logging configuration was inspected.
+- Pytest, Ruff and Bandit checks passed.
+
+### Residual Risks
+
+- Local Docker logs may be altered or deleted by privileged users.
+- Log rotation eventually removes older events.
+- Logs are not forwarded to centralized storage.
+- Logs do not provide cryptographic proof of event authenticity.
+- Current application logging does not identify individual users.
+- Sensitive information could still appear in request URLs
+  or other unfiltered logs.
+
+### Future Improvements
+
+- Centralized logging and retention policies.
+- Structured JSON security events.
+- Request correlation IDs.
+- Monitoring and alerting for suspicious activity.
+- Restricted access to audit logs.

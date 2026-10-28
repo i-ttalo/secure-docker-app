@@ -55,3 +55,29 @@ def test_db_connection_reads_secret(monkeypatch):
     connection = app_module.get_db_connection()
 
     assert connection is fake_connection
+
+
+def test_db_failure_logs_security_event(monkeypatch, caplog):
+    import logging
+
+    import psycopg2
+
+    def fake_connection():
+        raise psycopg2.OperationalError("Simulated database failure")
+
+    monkeypatch.setattr(
+        app_module,
+        "get_db_connection",
+        fake_connection,
+    )
+
+    with caplog.at_level(logging.WARNING, logger=app.logger.name):
+        response = app.test_client().get("/db-health")
+
+    assert response.status_code == 500
+    assert response.json == {
+        "database": "error",
+        "message": "Database unavailable",
+    }
+    assert "security_event=db_connection_failed" in caplog.text
+    assert "Simulated database failure" not in caplog.text

@@ -226,3 +226,50 @@ install malicious tools, or abuse excessive privileges.
 - Application vulnerabilities can still allow unauthorized requests.
 - Docker daemon or host compromise can bypass container isolation.
 - Runtime controls do not replace patching and monitoring.
+
+
+## THREAT-005 — Service Identity Spoofing
+
+**STRIDE Category:** Spoofing
+
+### Threat Description
+
+An attacker could attempt to impersonate an application
+service or connect to PostgreSQL using stolen, invalid,
+or unauthorized credentials.
+
+### Affected Assets
+
+- PostgreSQL database
+- Backend service identity
+- Docker network boundaries
+- Database authentication credentials
+
+### Implemented Mitigations
+
+1. Frontend and database use separate Docker networks.
+2. Backend participates in both networks to enable
+   communication between the application layers.
+3. PostgreSQL does not publish port 5432 to the host.
+4. PostgreSQL requires authentication using credentials.
+5. Database credentials are provided through Docker Secrets.
+
+### Verification
+
+- Frontend network successfully reached the backend.
+- Database hostname was not resolvable from the frontend network.
+- Database hostname resolved from the backend network.
+- PostgreSQL rejected an incorrect password.
+- The backend successfully connected using its configured secret.
+
+### Residual Risks
+
+- Docker network isolation does not provide cryptographic
+  service identity verification.
+- DNS isolation alone does not prove that all IP-level
+  communication is blocked.
+- Compromised containers or stolen credentials may allow
+  unauthorized database access.
+- Mutual TLS is not currently implemented between services.
+- Privileged access to the Docker host may bypass network
+  and credential protections.
